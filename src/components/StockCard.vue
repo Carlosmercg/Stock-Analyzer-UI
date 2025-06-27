@@ -1,30 +1,38 @@
+<script setup lang="ts">
+import type { Stock } from '../types/Stock'
+
+const props = defineProps<Stock>()
+
+const timeFormatted = new Date(props.Time).toLocaleDateString()
+</script>
+
 <template>
   <div
     class="w-full bg-white text-black border border-gray-200 rounded-xl p-8 shadow-lg text-left h-full min-h-[320px] text-base"
   >
     <div class="mb-4">
-      <h2 class="text-xl font-bold">{{ company }}</h2>
+      <h2 class="text-xl font-bold">{{ Company }}</h2>
       <p class="text-sm text-gray-600">{{ timeFormatted }}</p>
     </div>
 
     <div class="space-y-2 text-[1rem] leading-relaxed">
       <p>
-        <strong>Target:</strong>
-        <span class="text-blue-700">{{ targetFrom }}</span>
+        <strong>Target: </strong>
+        <span class="text-blue-700">{{ TargetFrom }}</span>
         →
-        <span class="text-blue-700">{{ targetTo }}</span>
+        <span class="text-blue-700">{{ TargetTo }}</span>
       </p>
       <p>
-        <strong>Rating:</strong>
-        <span class="text-green-700">{{ ratingFrom }}</span>
+        <strong>Rating: </strong>
+        <span class="text-green-700">{{ RatingFrom }}</span>
         →
-        <span class="text-green-700">{{ ratingTo }}</span>
+        <span class="text-green-700">{{ RatingTo }}</span>
       </p>
       <p>
-        <strong>Brokerage:</strong> {{ brokerage }}
+        <strong>Brokerage:</strong> {{ Brokerage }}
       </p>
       <p>
-        <strong>Action:</strong> {{ action }}
+        <strong>Action:</strong> {{ Action }}
       </p>
     </div>
 
@@ -37,19 +45,3 @@
     </div>
   </div>
 </template>
-
-
-<script setup lang="ts">
-const props = defineProps<{
-  company: string
-  time: string
-  targetFrom: string
-  targetTo: string
-  ratingFrom: string
-  ratingTo: string
-  brokerage: string
-  action: string
-}>()
-
-const timeFormatted = new Date(props.time).toLocaleDateString()
-</script>

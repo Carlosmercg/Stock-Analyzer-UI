@@ -1,35 +1,72 @@
+<script setup lang="ts">
+import { ref, onMounted, watch, computed } from 'vue'
+import StockCard from './StockCard.vue'
+import { fetchStocks } from '../services/stockService'
+import type { Stock } from '../types/Stock'
+
+
+const stocks = ref<Stock[]>([])
+const currentPage = ref(1)
+const itemsPerPage = 21
+const totalItems = ref(0)
+
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage))
+
+const loadPage = async (page: number) => {
+  try {
+    const response = await fetchStocks(page, itemsPerPage)
+    stocks.value = response.data
+    totalItems.value = response.total
+  } catch (error) {
+    console.error('Error cargando stocks:', error)
+  }
+}
+
+onMounted(() => loadPage(currentPage.value))
+
+watch(currentPage, (newPage) => loadPage(newPage))
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+const prevPage = () => {
+    if (currentPage.value > 1) {
+    currentPage.value--
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+</script>
+
 <template>
   <div class="px-4 py-8">
-    <div class="grid grid-cols-3 gap-8 max-w-screen-2xl mx-auto">
+    <div class="max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <StockCard
         v-for="item in stocks"
         :key="item.ID"
-        :company="item.Company"
-        :time="item.Time"
-        :targetFrom="item.TargetFrom"
-        :targetTo="item.TargetTo"
-        :ratingFrom="item.RatingFrom"
-        :ratingTo="item.RatingTo"
-        :brokerage="item.Brokerage"
-        :action="item.Action"
+        v-bind="item"
       />
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-8 flex justify-center gap-4">
+      <button
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        class="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
+      >
+        Anterior
+      </button>
+      <span class="self-center text-black">Página {{ currentPage }} de {{ totalPages }}</span>
+      <button
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        class="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 disabled:opacity-50"
+      >
+        Siguiente
+      </button>
     </div>
   </div>
 </template>
-
-
-<script setup lang="ts">
-import StockCard from './StockCard.vue'
-
-const stocks = Array.from({ length: 100 }, (_, i) => ({
-  ID: i + 1,
-  Company: `Company ${i + 1}`,
-  Time: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString(),
-  TargetFrom: `$${(Math.random() * 100 + 20).toFixed(2)}`,
-  TargetTo: `$${(Math.random() * 100 + 20).toFixed(2)}`,
-  RatingFrom: ['Outperform', 'Neutral', 'Buy', 'Sell'][Math.floor(Math.random() * 4)],
-  RatingTo: ['Outperform', 'Neutral', 'Buy', 'Sell'][Math.floor(Math.random() * 4)],
-  Brokerage: ['Goldman Sachs', 'JP Morgan', 'Morgan Stanley', 'Wedbush', 'UBS'][Math.floor(Math.random() * 5)],
-  Action: ['reiterated by', 'downgraded by', 'upgraded by', 'initiated by', 'target raised by'][Math.floor(Math.random() * 5)]
-}))
-</script>
