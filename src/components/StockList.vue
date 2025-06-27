@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import StockCard from './StockCard.vue'
-import { fetchStocks } from '../services/stockService'
+import { fetchStocks, fetchStocksByCompany } from '../services/stockService'
 import type { Stock } from '../types/Stock'
 
+const props = defineProps<{
+  searchQuery: string
+}>()
 
 const stocks = ref<Stock[]>([])
 const currentPage = ref(1)
@@ -14,9 +17,17 @@ const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage))
 
 const loadPage = async (page: number) => {
   try {
-    const response = await fetchStocks(page, itemsPerPage)
-    stocks.value = response.data
-    totalItems.value = response.total
+    if (props.searchQuery.trim() !== '') {
+      // 🔍 Buscar con filtro por compañía
+      const result = await fetchStocksByCompany(props.searchQuery.trim())
+      stocks.value = result
+      totalItems.value = result.length
+    } else {
+      // 📄 Cargar paginado normal
+      const response = await fetchStocks(page, itemsPerPage)
+      stocks.value = response.data
+      totalItems.value = response.total
+    }
   } catch (error) {
     console.error('Error cargando stocks:', error)
   }
@@ -24,7 +35,13 @@ const loadPage = async (page: number) => {
 
 onMounted(() => loadPage(currentPage.value))
 
+
 watch(currentPage, (newPage) => loadPage(newPage))
+
+watch(() => props.searchQuery, () => {
+  currentPage.value = 1
+  loadPage(1)
+})
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {

@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const searchQuery = ref('')
+const route = useRoute()
 
 const handleSearch = () => {
-  console.log('Buscar:', searchQuery.value)
+  // Solo recarga si ya estás en / o /stocks
+  if (route.name === 'Home') {
+    // Nada, ya se reactiva vía prop
+  } else {
+    // Opcional: podrías redirigir si estás en otra ruta
+  }
 }
 </script>
 
@@ -17,7 +24,7 @@ const handleSearch = () => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Buscar empresa, broker..."
+          placeholder="Buscar empresa ...."
           @keydown.enter="handleSearch"
           class="w-full lg:max-w-md rounded-md bg-white text-black px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
@@ -39,7 +46,7 @@ const handleSearch = () => {
 
     <!-- 🔻 CONTENIDO PRINCIPAL -->
     <div class="px-4 py-8">
-      <router-view />
+      <router-view :search-query="searchQuery" />
     </div>
   </div>
 </template>

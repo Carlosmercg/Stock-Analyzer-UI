@@ -15,3 +15,10 @@ export const fetchStocks = async (
   })
   return response.data
 }
+
+export const fetchStocksByCompany = async (company: string): Promise<Stock[]> => {
+  const response = await api.get('/stocks/filter', {
+    params: { company }
+  })
+  return response.data
+}
