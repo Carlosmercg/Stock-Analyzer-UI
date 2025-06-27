@@ -1,6 +1,6 @@
 <template>
-  <div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-start">
+  <div class="px-4 py-8">
+    <div class="grid grid-cols-3 gap-8 max-w-screen-2xl mx-auto">
       <StockCard
         v-for="item in stocks"
         :key="item.ID"
@@ -17,32 +17,19 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import StockCard from './StockCard.vue'
 
-const stocks = [
-  {
-    ID: 1,
-    Company: 'Nuvalent',
-    Time: '2025-06-26T00:30:05.314624Z',
-    TargetFrom: '$105.00',
-    TargetTo: '$112.00',
-    RatingFrom: 'Outperform',
-    RatingTo: 'Outperform',
-    Brokerage: 'Robert W. Baird',
-    Action: 'target raised by'
-  },
-  {
-    ID: 2,
-    Company: 'Voyager Therapeutics',
-    Time: '2025-01-14T00:30:05.813548892Z',
-    TargetFrom: '$11.00',
-    TargetTo: '$9.00',
-    RatingFrom: 'Outperform',
-    RatingTo: 'Outperform',
-    Brokerage: 'Wedbush',
-    Action: 'reiterated by'
-  },
-  // Agrega más objetos aquí...
-]
+const stocks = Array.from({ length: 100 }, (_, i) => ({
+  ID: i + 1,
+  Company: `Company ${i + 1}`,
+  Time: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString(),
+  TargetFrom: `$${(Math.random() * 100 + 20).toFixed(2)}`,
+  TargetTo: `$${(Math.random() * 100 + 20).toFixed(2)}`,
+  RatingFrom: ['Outperform', 'Neutral', 'Buy', 'Sell'][Math.floor(Math.random() * 4)],
+  RatingTo: ['Outperform', 'Neutral', 'Buy', 'Sell'][Math.floor(Math.random() * 4)],
+  Brokerage: ['Goldman Sachs', 'JP Morgan', 'Morgan Stanley', 'Wedbush', 'UBS'][Math.floor(Math.random() * 5)],
+  Action: ['reiterated by', 'downgraded by', 'upgraded by', 'initiated by', 'target raised by'][Math.floor(Math.random() * 5)]
+}))
 </script>

@@ -1,13 +1,13 @@
 <template>
   <div
-    class="w-full max-w-[320px] sm:max-w-[400px] bg-white text-black border border-gray-200 rounded-xl p-6 shadow-lg text-left"
+    class="w-full bg-white text-black border border-gray-200 rounded-xl p-8 shadow-lg text-left h-full min-h-[320px] text-base"
   >
     <div class="mb-4">
-      <h2 class="text-lg font-bold">{{ company }}</h2>
+      <h2 class="text-xl font-bold">{{ company }}</h2>
       <p class="text-sm text-gray-600">{{ timeFormatted }}</p>
     </div>
 
-    <div class="text-sm space-y-1">
+    <div class="space-y-2 text-[1rem] leading-relaxed">
       <p>
         <strong>Target:</strong>
         <span class="text-blue-700">{{ targetFrom }}</span>
@@ -30,13 +30,14 @@
 
     <div class="mt-6">
       <button
-        class="w-full rounded-md bg-gray-900 py-2 text-white text-sm font-semibold hover:bg-gray-800 transition"
+        class="w-full rounded-md bg-slate-700 py-3 text-white text-base font-semibold hover:bg-gray-800 transition"
       >
         Show More
       </button>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 const props = defineProps<{
