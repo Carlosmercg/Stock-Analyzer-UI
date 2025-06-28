@@ -2,7 +2,7 @@
 import type { Stock } from '../types/Stock'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, watch } from 'vue'
-import { fetchStocksByCompany, fetchTopByBrokerage } from '../services/stockService'
+import { fetchFilteredStocks, fetchTopByBrokerage } from '../services/stockService'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,8 +13,8 @@ const topByBrokerage = ref<Stock[]>([])
 const scrollContainer = ref<HTMLElement | null>(null)
 
 const loadData = async (company: string) => {
-  const results = await fetchStocksByCompany(company)
-  stock.value = results[0] || null
+  const results = await fetchFilteredStocks({ company })
+  stock.value = results.data[0] || null
 
   if (stock.value?.Brokerage) {
     const top = await fetchTopByBrokerage(stock.value.Brokerage)
@@ -23,7 +23,6 @@ const loadData = async (company: string) => {
     topByBrokerage.value = []
   }
 }
-
 onMounted(() => {
   loadData(companyName)
 })

@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import StockCard from './StockCard.vue'
-import { fetchStocks, fetchStocksByCompany, fetchTopStocks } from '../services/stockService'
+import { fetchStocks, fetchFilteredStocks, fetchTopStocks } from '../services/stockService'
 import type { Stock } from '../types/Stock'
 import { useRouter, useRoute } from 'vue-router'
 
-const props = defineProps<{
-  searchQuery: string
-}>()
+
 const router = useRouter()
 const route = useRoute()
 
@@ -26,10 +24,21 @@ const goToCompany = (company: string) => {
 
 const loadPage = async (page: number) => {
   try {
-    if (props.searchQuery.trim() !== '') {
-      const result = await fetchStocksByCompany(props.searchQuery.trim())
-      stocks.value = result
-      totalItems.value = result.length
+    const query = route.query
+
+    const filters = {
+      company: typeof query.company === 'string' ? query.company.trim() : undefined,
+      rating_to: typeof query.ratingto === 'string' ? query.ratingto : undefined,
+      brokerage: typeof query.brokerage === 'string' ? query.brokerage : undefined,
+      // Puedes agregar aquí más filtros si los usas luego
+    }
+
+    const hasAnyFilter = Object.values(filters).some((v) => !!v)
+
+    if (hasAnyFilter) {
+    const result = await fetchFilteredStocks(filters, page, itemsPerPage)
+    stocks.value = result.data
+    totalItems.value = result.total
     } else {
       const response = await fetchStocks(page, itemsPerPage)
       stocks.value = response.data
@@ -39,6 +48,7 @@ const loadPage = async (page: number) => {
     console.error('Error cargando stocks:', error)
   }
 }
+
 
 const loadTopStocks = async () => {
   try {
@@ -55,10 +65,12 @@ onMounted(() => {
 
 watch(currentPage, (newPage) => loadPage(newPage))
 
-watch(() => props.searchQuery, () => {
+
+watch(() => route.query, () => {
   currentPage.value = 1
   loadPage(1)
 })
+
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {

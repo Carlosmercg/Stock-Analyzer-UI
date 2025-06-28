@@ -16,9 +16,18 @@ export const fetchStocks = async (
   return response.data
 }
 
-export const fetchStocksByCompany = async (company: string): Promise<Stock[]> => {
+export const fetchFilteredStocks = async (
+  filters: {
+    company?: string
+    ticker?: string
+    brokerage?: string
+    rating_to?: string
+  },
+  page: number = 1,
+  limit: number = 21
+): Promise<{ data: Stock[]; total: number }> => {
   const response = await api.get('/stocks/filter', {
-    params: { company }
+    params: { ...filters, page, limit },
   })
   return response.data
 }
@@ -34,3 +43,12 @@ export const fetchTopByBrokerage = async (brokerage: string) => {
   return data
 }
 
+export async function fetchBrokerages(): Promise<string[]> {
+  const response = await api.get('/stocks/brokerages')
+  return response.data
+}
+
+export async function fetchRatings(): Promise<string[]> {
+  const response = await api.get('/stocks/ratings')
+  return response.data
+}
