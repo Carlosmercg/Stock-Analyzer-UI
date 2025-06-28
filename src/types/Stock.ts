@@ -1,5 +1,6 @@
 export interface Stock {
   ID: string
+  Ticker: string
   Company: string
   Time: string
   TargetFrom: string

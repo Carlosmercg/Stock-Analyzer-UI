@@ -55,9 +55,17 @@ const scrollRight = () => {
       <!-- 🏢 INFORMACIÓN DE LA EMPRESA -->
       <div class="w-full bg-white rounded-xl p-12 shadow-sm text-black space-y-8">
         <div v-if="stock">
-          <h1 class="text-5xl font-bold text-slate-800 mb-4 text-center">
-            {{ stock.Company }}
-          </h1>
+          <div class="text-center mb-4">
+            <h1 class="text-5xl font-bold text-slate-800">
+              {{ stock.Company }}
+            </h1>
+            <div
+              v-if="stock.Ticker"
+              class="mt-2 inline-block text-2xl font-semibold text-blue-600 bg-blue-100 px-4 py-1 rounded-md shadow-sm"
+            >
+              {{ stock.Ticker }}
+            </div>
+          </div>
           <p class="text-center text-gray-500 text-lg mb-10">
             Última actualización: {{ formatDate(stock.Time) }}
           </p>

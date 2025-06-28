@@ -30,15 +30,15 @@ const loadPage = async (page: number) => {
       company: typeof query.company === 'string' ? query.company.trim() : undefined,
       rating_to: typeof query.ratingto === 'string' ? query.ratingto : undefined,
       brokerage: typeof query.brokerage === 'string' ? query.brokerage : undefined,
-      // Puedes agregar aquí más filtros si los usas luego
+      order: typeof query.order === 'string' ? (query.order as 'asc' | 'desc') : undefined,
     }
 
-    const hasAnyFilter = Object.values(filters).some((v) => !!v)
+    const hasAnyFilter = Object.values(filters).some(Boolean)
 
     if (hasAnyFilter) {
-    const result = await fetchFilteredStocks(filters, page, itemsPerPage)
-    stocks.value = result.data
-    totalItems.value = result.total
+      const result = await fetchFilteredStocks(filters, page, itemsPerPage)
+      stocks.value = result.data
+      totalItems.value = result.total
     } else {
       const response = await fetchStocks(page, itemsPerPage)
       stocks.value = response.data
@@ -48,6 +48,7 @@ const loadPage = async (page: number) => {
     console.error('Error cargando stocks:', error)
   }
 }
+
 
 
 const loadTopStocks = async () => {

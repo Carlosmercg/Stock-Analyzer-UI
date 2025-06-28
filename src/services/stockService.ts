@@ -22,6 +22,7 @@ export const fetchFilteredStocks = async (
     ticker?: string
     brokerage?: string
     rating_to?: string
+    order?: 'asc' | 'desc' 
   },
   page: number = 1,
   limit: number = 21
