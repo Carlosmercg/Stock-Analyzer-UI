@@ -1,6 +1,7 @@
 // services/stockService.ts
 import axios from 'axios'
 import type { Stock } from '../types/Stock'
+import type { CompanyInfo } from '../types/CompanyInfo';
 
 const api = axios.create({
   baseURL: 'http://localhost:8085/api',
@@ -51,5 +52,13 @@ export async function fetchBrokerages(): Promise<string[]> {
 
 export async function fetchRatings(): Promise<string[]> {
   const response = await api.get('/stocks/ratings')
+  return response.data
+}
+
+
+export const fetchCompanyInfo = async (ticker: string): Promise<CompanyInfo> => {
+  const response = await api.get('/stocks/company/info', {
+    params: { ticker }
+  })
   return response.data
 }

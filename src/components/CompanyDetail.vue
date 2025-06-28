@@ -2,11 +2,13 @@
 import type { Stock } from '../types/Stock'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, watch } from 'vue'
-import { fetchFilteredStocks, fetchTopByBrokerage } from '../services/stockService'
+import { fetchFilteredStocks, fetchTopByBrokerage,fetchCompanyInfo } from '../services/stockService'
+import type { CompanyInfo } from '../types/CompanyInfo'
 
 const route = useRoute()
 const router = useRouter()
 const companyName = route.params.company as string
+const companyInfo = ref<CompanyInfo | null>(null)
 
 const stock = ref<Stock | null>(null)
 const topByBrokerage = ref<Stock[]>([])
@@ -23,15 +25,31 @@ const loadData = async (company: string) => {
     topByBrokerage.value = []
   }
 }
-onMounted(() => {
-  loadData(companyName)
+
+const loadCompanyInfo = async (ticker: string) => {
+  try {
+    companyInfo.value = await fetchCompanyInfo(ticker)
+  } catch (err) {
+    console.error('Error cargando companyInfo', err)
+  }
+}
+
+onMounted(async () => {
+  await loadData(companyName)
+  if (stock.value?.Ticker) {
+    await loadCompanyInfo(stock.value.Ticker)
+  }
 })
 
 watch(() => route.params.company, async (newCompany) => {
   if (typeof newCompany === 'string') {
     await loadData(newCompany)
+    if (stock.value?.Ticker) {
+      await loadCompanyInfo(stock.value.Ticker)
+    }
   }
 })
+
 
 const formatDate = (iso: string) => new Date(iso).toLocaleDateString()
 
@@ -54,48 +72,76 @@ const scrollRight = () => {
 
       <!-- 🏢 INFORMACIÓN DE LA EMPRESA -->
       <div class="w-full bg-white rounded-xl p-12 shadow-sm text-black space-y-8">
-        <div v-if="stock">
-          <div class="text-center mb-4">
-            <h1 class="text-5xl font-bold text-slate-800">
-              {{ stock.Company }}
-            </h1>
-            <div
-              v-if="stock.Ticker"
-              class="mt-2 inline-block text-2xl font-semibold text-blue-600 bg-blue-100 px-4 py-1 rounded-md shadow-sm"
+        <div v-if="stock" class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+          <!-- 📝 Información principal -->
+          <div class="flex-1 space-y-4">
+            <div class="text-center lg:text-left lg:flex lg:flex-col lg:items-start">
+              <h1 class="text-5xl font-bold text-slate-800 w-full text-center lg:text-left">
+                {{ stock.Company }}
+              </h1>
+              <div
+                v-if="stock.Ticker"
+                class="mt-2 inline-block text-2xl font-semibold text-blue-600 bg-blue-100 px-4 py-1 rounded-md shadow-sm mx-auto lg:mx-0"
+              >
+                {{ stock.Ticker }}
+              </div>
+            </div>
+            <p v-if="companyInfo?.description" class="text-lg text-gray-700">
+              {{ companyInfo.description }}
+            </p>
+
+            <a
+              v-if="companyInfo?.domain"
+              :href="companyInfo.domain"
+              target="_blank"
+              class="text-blue-600 underline text-sm"
             >
-              {{ stock.Ticker }}
+              {{ companyInfo.domain }}
+            </a>
+
+            <p class="text-gray-500 text-lg">
+              Última actualización: {{ formatDate(stock.Time) }}
+            </p>
+
+            <!-- 📊 Detalles adicionales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xl leading-relaxed mt-6">
+              <div>
+                <strong class="text-slate-700 block mb-1">🎯 Precio objetivo:</strong>
+                <span class="text-blue-700">{{ stock.TargetFrom }}</span>
+                →
+                <span class="text-blue-700">{{ stock.TargetTo }}</span>
+              </div>
+
+              <div>
+                <strong class="text-slate-700 block mb-1">📈 Calificación:</strong>
+                <span class="text-green-700">{{ stock.RatingFrom }}</span>
+                →
+                <span class="text-green-700">{{ stock.RatingTo }}</span>
+              </div>
+
+              <div>
+                <strong class="text-slate-700 block mb-1">🏢 Corredora:</strong>
+                {{ stock.Brokerage }}
+              </div>
+
+              <div>
+                <strong class="text-slate-700 block mb-1">📝 Acción:</strong>
+                {{ stock.Action }}
+              </div>
             </div>
           </div>
-          <p class="text-center text-gray-500 text-lg mb-10">
-            Última actualización: {{ formatDate(stock.Time) }}
-          </p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xl leading-relaxed">
-            <div>
-              <strong class="text-slate-700 block mb-1">🎯 Precio objetivo:</strong>
-              <span class="text-blue-700">{{ stock.TargetFrom }}</span>
-              →
-              <span class="text-blue-700">{{ stock.TargetTo }}</span>
-            </div>
-
-            <div>
-              <strong class="text-slate-700 block mb-1">📈 Calificación:</strong>
-              <span class="text-green-700">{{ stock.RatingFrom }}</span>
-              →
-              <span class="text-green-700">{{ stock.RatingTo }}</span>
-            </div>
-
-            <div>
-              <strong class="text-slate-700 block mb-1">🏢 Corredora:</strong>
-              {{ stock.Brokerage }}
-            </div>
-
-            <div>
-              <strong class="text-slate-700 block mb-1">📝 Acción:</strong>
-              {{ stock.Action }}
-            </div>
+          <!-- 🖼️ Logo de la empresa -->
+          <div class="flex-shrink-0">
+            <img
+              v-if="companyInfo?.logo_url"
+              :src="companyInfo.logo_url"
+              alt="Logo"
+              class="w-48 h-48 object-contain rounded-xl border border-gray-300 shadow"
+            />
           </div>
         </div>
+
 
         <div v-else class="text-center text-gray-500 text-lg">
           Cargando información de la empresa...
