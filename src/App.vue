@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const searchQuery = ref('')
 const route = useRoute()
+const router = useRouter()
 
 const handleSearch = () => {
-  // Solo recarga si ya estás en / o /stocks
   if (route.name === 'Home') {
     // Nada, ya se reactiva vía prop
-  } else {
-    // Opcional: podrías redirigir si estás en otra ruta
   }
+}
+
+const goHome = () => {
+  router.push({ name: 'Home' })
 }
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-300 text-black">
-    <!-- 🔵 BANNER SUPERIOR (Sticky y claro) -->
-    <div class="sticky top-0 z-50 bg-slate-700 text-black px-6 py-4 shadow-md">
+    <!-- 🔵 BANNER -->
+    <div class="sticky top-0 z-50 bg-blue-400 text-black px-6 py-4 shadow-md">
       <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <!-- 🔍 Input de búsqueda -->
+        
+        <!-- 🔙 Logo con navegación -->
+        <div @click="goHome" class="cursor-pointer flex items-center space-x-2">
+          <img src="/Logo.png" alt="Stock Analyzer Logo" class="h-20 w-auto" />
+        </div>
+
+        <!-- 🔍 Input búsqueda -->
         <input
           v-model="searchQuery"
           type="text"
@@ -31,20 +39,20 @@ const handleSearch = () => {
 
         <!-- 🔘 Botones de filtros -->
         <div class="flex flex-wrap gap-2">
-          <button class="rounded-md bg-blue-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
+          <button class="rounded-md bg-slate-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
             Filtrar por Fecha
           </button>
-          <button class="rounded-md bg-blue-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
+          <button class="rounded-md bg-slate-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
             Filtrar por Rating
           </button>
-          <button class="rounded-md bg-blue-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
+          <button class="rounded-md bg-slate-700 hover:bg-slate-500 px-4 py-2 text-sm font-semibold text-white">
             Filtrar por Broker
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 🔻 CONTENIDO PRINCIPAL -->
+    <!-- 🔻 CONTENIDO -->
     <div class="px-4 py-8">
       <router-view :search-query="searchQuery" />
     </div>

@@ -22,3 +22,15 @@ export const fetchStocksByCompany = async (company: string): Promise<Stock[]> =>
   })
   return response.data
 }
+
+export const fetchTopStocks = async (): Promise<Stock[]> => {
+  const response = await api.get('/stocks/top')
+  return response.data
+}
+
+export const fetchTopByBrokerage = async (brokerage: string) => {
+  const response = await fetch(`http://localhost:8085/api/stocks/top-by-brokerage?brokerage=${encodeURIComponent(brokerage)}`)
+  const data = await response.json()
+  return data
+}
+

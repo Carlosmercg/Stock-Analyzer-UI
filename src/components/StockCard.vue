@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { Stock } from '../types/Stock'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<Stock>()
+const router = useRouter()
 
 const timeFormatted = new Date(props.Time).toLocaleDateString()
+
+const goToCompany = () => {
+  router.push({ name: 'CompanyDetail', params: { company: props.Company } })
+}
 </script>
 
 <template>
@@ -38,7 +44,8 @@ const timeFormatted = new Date(props.Time).toLocaleDateString()
 
     <div class="mt-6">
       <button
-        class="w-full rounded-md bg-slate-700 py-3 text-white text-base font-semibold hover:bg-gray-800 transition"
+        @click="goToCompany"
+        class="w-full rounded-md bg-blue-400 py-3 text-white text-base font-semibold hover:bg-gray-800 transition"
       >
         Show More
       </button>
